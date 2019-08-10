@@ -1,11 +1,6 @@
 const express = require('express');
 const uuidv4 = require('uuid/v4');
-
-const tokenValidate = require('../../libs/tokenValidate');
 const validateProducto = require('./productos.validate');
-
-const productoController = require('./productos.controller');
-
 const productos = require('../../../db').productos;
 
 const passport = require('passport')
@@ -18,15 +13,8 @@ const logger = require('../../utils/logger');
 
 // /productos/productos
 productsRoutes.get('/', (req, res) => {
-  productoController.obtenerProductos()
-  .then((productos) => {
-    logger.info('Se obtuvo todos los productos');
-    res.json(productos);
-  })
-  .catch((err) => {
-    res.status(500).send(`Algo ocurrio en la db.`)
-  })
-  
+  logger.info('Se obtuvo todos los productos');
+  res.json(productos);
 });
 
 productsRoutes.post('/', [jwtAuthenticate, validateProducto], (req, res) => {
@@ -43,15 +31,17 @@ productsRoutes.post('/', [jwtAuthenticate, validateProducto], (req, res) => {
   })
 });
 
-productsRoutes.get('/:id', async (req, res) => {
-  try {
-    const producto = await productoController.obtenerProducto(req.params.id);
-    logger.info(`Se obtuvo el producto con id ${producto.id}`);
-    res.json(producto);
-  } catch (err) {
-    console.log(err);
-    res.status(500).send(`Ocurrio algo en la db.`);
-  }
+productsRoutes.get('/:id', (req, res) => {
+  // TODO: Implementar el 404
+  let productoFilter;
+  productos.forEach(producto => {
+    if (producto.id === req.params.id) {
+      productoFilter = producto;
+    }
+  });
+  logger.info(`Se obtuvo el producto con id ${productoFilter.id}`);
+  // productos.filter(producto => producto.id === req.params.id);
+  res.json(productoFilter);
 });
 
 productsRoutes.put('/:id', validateProducto, async (req, res) => {
@@ -66,12 +56,20 @@ productsRoutes.put('/:id', validateProducto, async (req, res) => {
 
 productsRoutes.delete('/:id', async (req, res) => {
   const id = req.params.id;
-  try {
-    const productoEliminado = await productoController.eliminarProducto(id);
-    res.json(productoEliminado);
-  } catch (err) {
-    res.status(500).send(`Ocurrio un error en la db.`); 
-  }
-});
 
+  let index;
+  let productoFilter;
+  productos.forEach((producto, i) => {
+    if (producto.id === id) {
+      index = i;
+      productoFilter = producto;
+    }
+    
+    
+  });
+    
+  productos.splice(index, 1);
+  res.json(productoFilter);
+});
+//hola masco
 module.exports = productsRoutes;

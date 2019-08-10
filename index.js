@@ -2,8 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const passport = require('passport');
-const mongoose = require('mongoose');
-
+const BasicStrategy = require('passport-http').BasicStrategy;
 const logger = require('./api/utils/logger');
 const productRouter = require('./api/recursos/productos/productos.routes');
 const usuariosRouter = require('./api/recursos/usuarios/usuarios.routes');
@@ -23,11 +22,7 @@ mongoose.connection.on('error', (error) => {
 
 app.use(bodyParser.json()); // IMPORTANTE!!!
 // stream: message => logger.info(message.trim())
-app.use(morgan('short', { 
-  stream: {
-    write: message => logger.info(message.trim()),
-  } 
-}));
+app.use(morgan('common', { stream: logger.stream.write }));
 app.use(passport.initialize());
 
 app.use('/usuarios', usuariosRouter);
@@ -36,8 +31,9 @@ app.use('/productos', productRouter);
 passport.use(authJWT);
 
 
-// passport.authenticate('jwt', { session: false });
-app.get('/',(request, response) => {
+app.get('/', passport.authenticate('jwt', { session: false }), (request, response) => {
+  
+  console.log(request.user);
   logger.error('Se hizo peticion al /');
   response.send('Hello World');
 });
