@@ -46,17 +46,6 @@ productsRoutes.get('/:id', (req, res) => {
 
 productsRoutes.put('/:id', validateProducto, async (req, res) => {
   const id = req.params.id;
-  try {
-    const productoModificado = await productoController.modificarProducto(id, req.body)  
-    res.json(productoModificado);
-  } catch (err) {
-    res.status(500).send(`Error en la db.`)
-  }
-});
-
-productsRoutes.delete('/:id', async (req, res) => {
-  const id = req.params.id;
-
   let index;
   let productoFilter;
   productos.forEach((producto, i) => {
@@ -64,7 +53,25 @@ productsRoutes.delete('/:id', async (req, res) => {
       index = i;
       productoFilter = producto;
     }
-    
+  });
+  logger.info(`Se ha actulizado un producto de cod: ${productoFilter.id}`)
+  productos[index] = { ...productoFilter, ...req.body };
+  res.json(productos[index]);
+});
+
+productsRoutes.delete('/:id', async (req, res) => {
+  const id = req.params.id;
+  const name = req.params.titulo;
+
+  let index;
+  let productoFilter;
+  productos.forEach((producto, i) => {
+    if (producto.id === id) {
+      producto.titulo === name;
+      index = i;
+      productoFilter = producto;
+    }
+    logger.warn(`Se ha borrado un producto : ${productoFilter.id}; ${productoFilter.name}`)
     
   });
     

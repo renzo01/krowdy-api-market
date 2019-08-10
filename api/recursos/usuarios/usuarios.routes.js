@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 
 const validateUsuario = require('./usuarios.validate');
 const usuarios = require('../../../db').usuarios;
+const logger = require('../../utils/logger');
+
 const usuariosRoutes = express.Router();
 
 
@@ -20,12 +22,14 @@ usuariosRoutes.post('/', validateUsuario, (req, res) => {
     if (err) {
       // logger.info(error)
       res.status(500).send(`A ocurrido un error en el servidor con bcrypt`);
+      logger.error(`No se ha podido crear el usuario.`);
       return
     }
     
     const newUser = { ...req.body, password: hashedPassword, id: uuidv4() };
     usuarios.push(newUser)
     res.status(201).send(`El usuario fue creado con exito.`);
+    logger.info(`El usuario ${req.body.username} se ha registrado`);
   });
 
 });
@@ -34,6 +38,7 @@ usuariosRoutes.post('/login', validateUsuario, (req, res) => {
   const index = usuarios.findIndex(usuario => usuario.username === req.body.username);
   if (index === -1) {
     res.status(404).send(`El usuario no existe. Verifica tu informacion.`);
+    logger.error(`El usuario ${req.body.username} ha intentado logearse sin exito`);
     return;
   }
   

@@ -2,8 +2,8 @@ const Joi = require('@hapi/joi');
 
 // TODO: Agregar validaciones de JOI al Schema de usuario
 const blueprintUsuario = Joi.object().keys({
-  username: Joi.string().required(),
-  password: Joi.string().required(),
+  username: Joi.string().alphanum().required(),
+  password: Joi.string().min(6).required(),
 });
 
 module.exports = (req, res, next) => {
