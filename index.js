@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const passport = require('passport');
-const BasicStrategy = require('passport-http').BasicStrategy;
+
 const logger = require('./api/utils/logger');
 const productRouter = require('./api/recursos/productos/productos.routes');
 const usuariosRouter = require('./api/recursos/usuarios/usuarios.routes');
