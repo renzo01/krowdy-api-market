@@ -7,13 +7,15 @@ const configJWT = {
   jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
 }
 
-let jwtStrategy = new passportJWT.Strategy(configJWT, (jwtPayload, next) => {
+let jwtStrategy = new passportJWT.Strategy(configJWT, (jwtPayload, done) => {
   const usuarioLogeado = usuarios.filter(usuario => usuario.id === jwtPayload.id)
-  
-  next(null, {
+  console.log(usuarioLogeado)
+  const usuario = {
     id: usuarioLogeado.id,
-    username: usuarioLogeado.name,
-  });
+    username: usuarioLogeado.username,
+  }
+  
+  return done(null, 'hola');
 })
 
 module.exports = jwtStrategy;

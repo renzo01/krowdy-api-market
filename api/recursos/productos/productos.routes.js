@@ -13,8 +13,9 @@ productsRoutes.get('/',tokenValidate ,(req, res) => {
   res.json(productos);
 });
 
-productsRoutes.post('/', tokenValidate ,validateProducto, (req, res) => {
+productsRoutes.post('/', [tokenValidate ,validateProducto], (req, res) => {
   const productoNuevo = { ...req.body, id: uuidv4() };
+  console.log(req.user)
   productos.push(productoNuevo);
   res.status(201).json(productoNuevo);
 });
@@ -39,7 +40,7 @@ productsRoutes.get('/:id', tokenValidate,(req, res) => {
   res.json(productoFilter);
 });
 
-productsRoutes.put('/:id', [validateProducto,tokenValidate], (req, res) => {
+productsRoutes.put('/:id', [tokenValidate,validateProducto], (req, res) => {
   const id = req.params.id;
   let index;
   let productoFilter;
