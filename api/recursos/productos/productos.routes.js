@@ -23,14 +23,13 @@ productsRoutes.get('/', jwtAuthenticate, (req, res) => {
   })
 });
 
-  productoController.crearProducto(productoNuevo).then((productos) =>{
+productoController.crearProducto(productoNuevo).then((productos) => {
     //add a product
     productos.push(productos);
     resp.status(201).json(productos);
   }).catch((err) => {
     logger.error(`Algo ocurrio en la db`);
-  })
-});
+  });
 
 productsRoutes.get('/:id', async (req,resp) => {
   try{
@@ -39,7 +38,18 @@ productsRoutes.get('/:id', async (req,resp) => {
     resp.json(producto);
   }catch (err){
     console.log(err);
-    resp.status(500).send(`Ocurrio algo en la db`);
+    res.status(500).send(`Ocurrio algo en la db.`);
+  }
+});
+
+productsRoutes.put('/:id', validateProducto, async (req, res) => {
+  const id = req.params.id;
+  try {
+    const productoModificado = await productoController.modificarProducto(id, req.body);
+    logger.info(`Se han cambiado la informacion del producto`);
+    res.json(productoModificado);
+  } catch (err) {
+    res.status(500).send(`Error en la db.`)
   }
 });
 
@@ -47,8 +57,10 @@ productsRoutes.delete('/:id', async (req, resp) =>{
   const id = req.param.id;
   try {
     const productoEliminado = await productoController.eliminarProducto(id);
-  } catch (err){
-    resp.status(500).send(`Ocurrio un error en la db`);
+    logger.warn(`Se ha eliminado un producto.`);
+    res.json(productoEliminado);
+  } catch (err) {
+    res.status(500).send(`Ocurrio un error en la db.`); 
   }
 });
 
