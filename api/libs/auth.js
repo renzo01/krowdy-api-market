@@ -8,12 +8,13 @@ const configJWT = {
   jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
 }
 
-let jwtStrategy = new passportJWT.Strategy(configJWT, async (jwtPayload, next) => {
+let jwtStrategy = new passportJWT.Strategy(configJWT, async (jwtPayload, done) => {
   const usuarioLogueado = await usuarioController.obtenerUsuario(null, jwtPayload.id);
-  next(null, {
+  const usuario = {
     id: usuarioLogueado.id,
-    username: usuarioLogueado.username
-  });
+    username : usuarioLogueado.username
+  }
+  return done(`ha ocurrido un error con la authentificacion.`,null)
 });
 
 module.exports = jwtStrategy;
