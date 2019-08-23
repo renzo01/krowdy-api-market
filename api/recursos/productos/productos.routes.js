@@ -13,18 +13,15 @@ const productsRoutes = express.Router();
 
 const logger = require('../../utils/logger');
 
-productsRoutes.get('/', jwtAuthenticate, (req, resp) =>{
+// /productos/productos
+productsRoutes.get('/', jwtAuthenticate, (req, res) => {
   console.log(req.user);
   logger.info('Se obtuvo todos los productos');
-  productoController.obtenerProductos().then((productos) => {
-    resp.json(productos);
-  }).catch((err) => {
-    resp.status(500).send('Algo ocurrio en la db');
+  productoController.obtenerProductos()
+  .then((productos) => {
+    res.json(productos);
   })
 });
-//When do you want to use 2 middleware
-productsRoutes.post('/', [jwtAuthenticate, validateProducto], (req, resp) => {
-  const productoNuevo = { ...req.body, owner: req.user.username };
 
   productoController.crearProducto(productoNuevo).then((productos) =>{
     //add a product
