@@ -1,82 +1,58 @@
 const express = require('express');
 const uuidv4 = require('uuid/v4');
-const validateProducto = require('./productos.validate');
+const passport = require('passport');
+
+const tokenValidate = require('../../libs/tokenValidate');
+const validateProducto = require('../productos/productos.validate');
+const productoController = require('../productos/productos.controller');
 const productos = require('../../../db').productos;
 
-const passport = require('passport')
-const jwtAuthenticate = passport.authenticate('jwt', { session: false });
-
+const jwtAuthenticate = passport.authenticate('jwt', {session: false})
 
 const productsRoutes = express.Router();
 
 const logger = require('../../utils/logger');
 
-// /productos/productos
-productsRoutes.get('/', (req, res) => {
+productsRoutes.get('/', jwtAuthenticate, (req, resp) =>{
+  console.log(req.user);
   logger.info('Se obtuvo todos los productos');
-  res.json(productos);
+  productoController.obtenerProductos().then((productos) => {
+    resp.json(productos);
+  }).catch((err) => {
+    resp.status(500).send('Algo ocurrio en la db');
+  })
 });
-
-productsRoutes.post('/', [jwtAuthenticate, validateProducto], (req, res) => {
-  
+//When do you want to use 2 middleware
+productsRoutes.post('/', [jwtAuthenticate, validateProducto], (req, resp) => {
   const productoNuevo = { ...req.body, owner: req.user.username };
-  
-  productoController.crearProducto(productoNuevo)
-  .then((producto) => {
-    productos.push(producto);
-    res.status(201).json(producto);
+
+  productoController.crearProducto(productoNuevo).then((productos) =>{
+    //add a product
+    productos.push(productos);
+    resp.status(201).json(productos);
+  }).catch((err) => {
+    logger.error(`Algo ocurrio en la db`);
   })
-  .catch((error) => {
-    logger.error('Algo ocurrio en la db.')
-  })
 });
 
-productsRoutes.get('/:id', (req, res) => {
-  // TODO: Implementar el 404
-  let productoFilter;
-  productos.forEach(producto => {
-    if (producto.id === req.params.id) {
-      productoFilter = producto;
-    }
-  });
-  logger.info(`Se obtuvo el producto con id ${productoFilter.id}`);
-  // productos.filter(producto => producto.id === req.params.id);
-  res.json(productoFilter);
+productsRoutes.get('/:id', async (req,resp) => {
+  try{
+    const producto = await productoController.obtenerProducto(req.params.id);
+    logger.info(`Se obtuvo el producto con id ${producto.id}`);
+    resp.json(producto);
+  }catch (err){
+    console.log(err);
+    resp.status(500).send(`Ocurrio algo en la db`);
+  }
 });
 
-productsRoutes.put('/:id', validateProducto, async (req, res) => {
-  const id = req.params.id;
-  let index;
-  let productoFilter;
-  productos.forEach((producto, i) => {
-    if (producto.id === id) {
-      index = i;
-      productoFilter = producto;
-    }
-  });
-  logger.info(`Se ha actulizado un producto de cod: ${productoFilter.id}`)
-  productos[index] = { ...productoFilter, ...req.body };
-  res.json(productos[index]);
+productsRoutes.delete('/:id', async (req, resp) =>{
+  const id = req.param.id;
+  try {
+    const productoEliminado = await productoController.eliminarProducto(id);
+  } catch (err){
+    resp.status(500).send(`Ocurrio un error en la db`);
+  }
 });
 
-productsRoutes.delete('/:id', async (req, res) => {
-  const id = req.params.id;
-  const name = req.params.titulo;
-
-  let index;
-  let productoFilter;
-  productos.forEach((producto, i) => {
-    if (producto.id === id) {
-      producto.titulo === name;
-      index = i;
-      productoFilter = producto;
-    }
-    logger.warn(`Se ha borrado un producto : ${productoFilter.id}; ${productoFilter.name}`)
-    
-  });
-    
-  productos.splice(index, 1);
-  res.json(productoFilter);
-});
-//hola masco
 module.exports = productsRoutes;

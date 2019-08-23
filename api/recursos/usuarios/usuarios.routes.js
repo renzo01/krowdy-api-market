@@ -1,61 +1,53 @@
+//imports of libs
 const express = require('express');
 const uuidv4 = require('uuid/v4');
 const bcrypt = require('bcrypt');
-
 const jwt = require('jsonwebtoken');
+
+const usuarioController = require('./usuarios.controller');
 
 const validateUsuario = require('./usuarios.validate');
 const usuarios = require('../../../db').usuarios;
-const logger = require('../../utils/logger');
-
 const usuariosRoutes = express.Router();
 
-
-usuariosRoutes.get('/', (req, res) => {
-  console.log(usuarios);
-  res.json(usuarios); 
+usuariosRoutes.get('/', async (req,resp) => {
+  const usuarios = await usuarioController.obtenerUsuario();
+  resp.json(usuarios);
 });
 
-usuariosRoutes.post('/', validateUsuario, (req, res) => {
-  
-  bcrypt.hash(req.body.password, 10, (err, hashedPassword) => {
-    if (err) {
-      // logger.info(error)
-      res.status(500).send(`A ocurrido un error en el servidor con bcrypt`);
-      logger.error(`No se ha podido crear el usuario.`);
+usuariosRoutes.post('/', validateUsuario, async (req, resp) => {
+  bcrypt.hash(req.body.password, 10, async (err, hashedPassword) =>{
+    if (err){
+      resp.status(500).send(`A ocurrido un error en el servidor con bcrypt`);
       return
     }
-    
-    const newUser = { ...req.body, password: hashedPassword, id: uuidv4() };
-    usuarios.push(newUser)
-    res.status(201).send(`El usuario fue creado con exito.`);
-    logger.info(`El usuario ${req.body.username} se ha registrado`);
+    const newUser = {...req.body, password: hashedPassword, id: uuidv4()};
+    const usuarios = require('../../../db').usuarios;
+    resp.status(201).send(`El usuario fue creado con exito`);
   });
-
 });
 
-usuariosRoutes.post('/login', validateUsuario, (req, res) => {
-  const index = usuarios.findIndex(usuario => usuario.username === req.body.username);
-  if (index === -1) {
-    res.status(404).send(`El usuario no existe. Verifica tu informacion.`);
-    logger.error(`El usuario ${req.body.username} ha intentado logearse sin exito`);
-    return;
+usuariosRoutes.post('/login', validateUsuario, async (req, resp) =>{
+  const usuario = await usuarioController.obtenerUsuario(req.body.username)
+
+  if (!usuario) {
+    resp.status(201).send(`El usuario no existe. Verifica tu informacion`);
+    return
   }
-  
-  bcrypt.compare(req.body.password, usuarios[index].password, (err, coincide) => {
-    if (err) {
-      res.status(500).send(`Algo ocurrio ups!`);
-      return;
+  //when the user is founded
+  bcrypt.compare(req.body.password, usuario.password, (err, coinside) =>{
+    if(err) {
+        console.log(err);
+        resp.status(500).send(`Algo ocurrio`);
+        return;
     }
-    
-    if (coincide) { 
-      const token = jwt.sign({id: usuarios[index].id}, 'secreto', { expiresIn: 86400 });
-      console.log(token);
-      res.status(200).send({token});
+    if(coinside){
+      const token = jwt.sign({id: usuario['__id']}, 'secreto', {expiresIn: 86400});
+      resp.status(200).send({token});
     } else {
-      res.status(401).send(`Verifica tu password.`);
+      resp.status(401).send(`verifica tu password`);
     }
   });
-})
+});
 
 module.exports = usuariosRoutes;

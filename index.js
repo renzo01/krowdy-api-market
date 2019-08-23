@@ -1,54 +1,46 @@
+//imports of lib's necesaries
 const express = require('express');
 const bodyParser = require('body-parser');
-const morgan = require('morgan');
+const morgan  = require('morgan');
+//this functionality is for using a authentification strategy
 const passport = require('passport');
-
+//this lib use some functions of mongoDB
+const mongoose = require('mongoose');
+//imports of own component
 const logger = require('./api/utils/logger');
 const productRouter = require('./api/recursos/productos/productos.routes');
-const usuariosRouter = require('./api/recursos/usuarios/usuarios.routes');
-
+const usuarioRouter = require('./api/recursos/usuarios/usuarios.routes');
 const authJWT = require('./api/libs/auth');
 
 const app = express();
-
-
-mongoose.connect('mongodb://127.0.0.1:27017/training', { useNewUrlParser: true });
-mongoose.connection.on('error', (error) => {
+//in this part we connect with the monogodb
+mongoose.connect('mongodb://://root:training@172.31.23.49:27017/training?authSource=admin', { useNewUrlParser: true });
+mongoose.connection.on('error', (error) =>{
+  logger.error('Fallo la conexion!');
   logger.error(error);
-  logger.error('Fallo la conexion a mongodb');
-  process.exit(1);
-});
+  process.exit(1); //close conection
+})
+//comvert all in Json Type
+app.use(bodyParser.json());
 
-
-app.use(bodyParser.json()); // IMPORTANTE!!!
-// stream: message => logger.info(message.trim())
-app.use(morgan('common', { stream: logger.stream.write }));
+app.use(morgan('short',{
+  stream: {
+    //write a message of the status of the connection
+    write: message => logger.info(message.trim())
+  }
+}));
 app.use(passport.initialize());
-
-app.use('/usuarios', usuariosRouter);
-app.use('/productos', productRouter);
-
+//call the routers
+app.use('./usuarios', usuarioRouter);
+app.use('./productos', productRouter);
+//use an authentification, in this case is JWT
 passport.use(authJWT);
-
-
-app.get('/', passport.authenticate('jwt', { session: false }), (request, response) => {
-  
-  console.log(request.user);
+//when someone stay in this endpoint 
+app.get('/',(request, response) => {
   logger.error('Se hizo peticion al /');
   response.send('Hello World');
 });
-// Nayruth pide 3 pizzas :D*
+//message what show if the connection is on 
 app.listen(8080, () => {
-  console.log('Init server');
+  console.log('Init Server')
 });
-
-
-/*
-passport.use(new BasicStrategy((username, password, done) => {
-  if (username.valueOf() === 'luis' && password.valueOf() === 'krowdy123') {
-    done(null, true);
-  } else {
-    done(null, false);
-  }
-}));
-*/

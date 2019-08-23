@@ -1,31 +1,31 @@
 const Producto = require('./productos.model');
 
 function crearProducto(producto) {
-  return new Producto(producto).save();
+    return new Producto(producto).save();
 }
 
 function obtenerProductos() {
-  return Producto.find({});
+    return Producto.find({});
 }
 
 function obtenerProducto(id) {
-  return Producto.findById(id);
+    return Producto.findByID(id);
 }
 
-function modificarProducto(id, producto) {
-  return Producto.findOneAndUpdate({ _id: id}, {
-    ...producto
-  }, { new: true });
+function modificarProductos(id, productos) {
+    return Producto.findOneAndUpdate({ __id: id }, {
+        ...Producto
+    }, { new: true });
 }
 
-function eliminarProducto(id) {
-  return Producto.findOneAndDelete(id);
+function eliminarProducto(id){
+    return Producto.findOneAndDelete(id);
 }
-
+//export for using in other part of this proyect
 module.exports = {
-  crearProducto,
-  obtenerProductos,
-  obtenerProducto,
-  modificarProducto,
-  eliminarProducto,
+    crearProducto,
+    obtenerProductos,
+    obtenerProducto,
+    modificarProductos,
+    eliminarProducto
 }

@@ -1,25 +1,26 @@
+//import the necesaries libs
 const mongoose = require('mongoose');
 
 const productoSchema = new mongoose.Schema({
-  titulo: {
-    type: String,
-    required: [true, 'Producto debe tener un titulo']
-  },
-  precio: {
-    type: Number,
-    min: 0,
-    required: [true, 'Producto debe tener un precio']
-  },
-  moneda: {
-    type: String,
-    maxlength: 3,
-    minlength: 3,
-    required: [true, 'Producto debe tener una moneda']
-  },
-  owner: {
-    type: String,
-    required: [true, 'Producto debe tener un owner']
-  },
+    titulo: {
+        type: String,
+        required: [true, 'producto debe tener siquira un titulo']
+    },
+    precio: {
+        type: Number,
+        min: 0,
+        required: [true, 'Producto debe tener un precio']
+    },
+    moneda: {
+        type: String,
+        minlength: 3,
+        maxlength: 3,
+        required: [true, `producto debe tene una moneda siempre`]
+    },
+    owner: {
+        type: String,
+        required: [true, `producto debe tener un owner`]
+    }
 });
-
-module.exports = mongoose.model('producto', productoSchema);
+//the model is component by name and schema
+module.exports = mongoose.model('producto',productoSchema);
