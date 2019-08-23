@@ -1,7 +1,7 @@
-//imports of libs
 const express = require('express');
 const uuidv4 = require('uuid/v4');
 const bcrypt = require('bcrypt');
+
 const jwt = require('jsonwebtoken');
 
 const usuarioController = require('./usuarios.controller');
@@ -25,6 +25,7 @@ usuariosRoutes.post('/', validateUsuario, async (req, resp) => {
     const usuarios = require('../../../db').usuarios;
     resp.status(201).send(`El usuario fue creado con exito`);
   });
+
 });
 
 usuariosRoutes.post('/login', validateUsuario, async (req, resp) =>{
@@ -45,9 +46,9 @@ usuariosRoutes.post('/login', validateUsuario, async (req, resp) =>{
       const token = jwt.sign({id: usuario['__id']}, 'secreto', {expiresIn: 86400});
       resp.status(200).send({token});
     } else {
-      resp.status(401).send(`verifica tu password`);
+      res.status(401).send(`Verifica tu password.`);
     }
   });
-});
+})
 
 module.exports = usuariosRoutes;
