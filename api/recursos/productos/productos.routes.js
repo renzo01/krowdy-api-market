@@ -49,7 +49,7 @@ productsRoutes.get('/:id', async (req, res) => {
   }
 });
 
-productsRoutes.put('/:id', [tokenValidate, requireOwnerUser ,validateProducto], async (req, res) => {
+productsRoutes.put('/:id', [tokenValidate, validateProducto], async (req, res) => {
   const id = req.params.id;
   try {
     const productoModificado = await productoController.modificarProducto(id, req.body);
