@@ -29,12 +29,33 @@ https://medium.com/@perrysetgo/what-exactly-is-an-api-69f36968a41f
 https://code.tutsplus.com/tutorials/a-beginners-guide-to-http-and-rest--net-16340
 
 
-### Tareas de la semana2 :
+- Por que es importante validar nuestros datos:
+
+https://www.quora.com/Why-is-data-validation-important
+
+
+
+### Segunda clase:
+- https://medium.com/vandium-software/5-easy-steps-to-understanding-json-web-tokens-jwt-1164c0adfcec 
+- https://www.syslog-ng.com/community/b/blog/posts/why-logging-is-important
+- https://www.youtube.com/watch?v=o9hT7v0OLJc
+
+
+### Tareas de la Semana2 :
 
 * Agregar los loggers a los endpoints correspondiendes utilizando log.error, log.warn. log.info.
 * Hacer un middleware para la validacion de token.
 * Agregar el middleware de validacion para los endpoints de productos que lo requieran.
 
+
+### Tercera clase:
+- https://medium.com/@yanyzx/mongodb-qu%C3%A9-es-c%C3%B3mo-funciona-y-cu%C3%A1ndo-podemos-usarlo-8eafe0d441c2
+- 
+
+### Tareas de la Semana 3 :
+
+* Agregar los loggers a los endpoints correspondiendes utilizando log.error, log.warn. log.info. (Nuevamente) (Verificar)
+* Verificar que los endpoint no tengan bugs. (Por ejemplo si un usuario con el username Luis.Angel ya existe, no puede registrarse otra persona con el mismo username)(Verificar los flujos para ver si pueden haber otros bugs).
 
 
 

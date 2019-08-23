@@ -1,21 +1,22 @@
-const passport = require('passport');
 const passportJWT = require('passport-jwt');
-const usuarios = require('../../db').usuarios;
-
+const config = require('../../config');
+const usuarioController = require('../recursos/usuarios/usuarios.controller');
+const { secret } = config;
 const configJWT = {
-  secretOrKey: 'secreto',
+  secretOrKey: secret,
   jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
 }
 
-let jwtStrategy = new passportJWT.Strategy(configJWT, (jwtPayload, done) => {
-  const usuarioLogeado = usuarios.filter(usuario => usuario.id === jwtPayload.id)
-  console.log(usuarioLogeado)
-  const usuario = {
-    id: usuarioLogeado.id,
-    username: usuarioLogeado.username,
+let jwtStrategy = new passportJWT.Strategy(configJWT, async (jwtPayload, next) => {
+  try{
+    const usuarioLogeado = await usuarioController.obtenerUsuario(null, jwtPayload.id);  
+    next(null, {
+      id: usuarioLogeado.id,
+      username: usuarioLogeado.username,
+    });
+  } catch (err){
+    logger.error(`Algo ocurrio en la db ${err}`);    
   }
-  
-  return done(null, 'hola');
-})
+});
 
 module.exports = jwtStrategy;
