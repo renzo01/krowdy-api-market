@@ -53,10 +53,19 @@ productsRoutes.get('/:id', ProcessarError((req, resp) => {
   return productoController.obtenerProducto(id)
   .then((producto) =>{
     if(!producto) throw new ProductoNoExiste(`El producto no existe`);
-    res.json(producto);
+    resp.json(producto);
   })
   logger.info(`Se obtuvo el producto con id ${producto.id}`);
-  res.json(producto);
+  resp.json(producto);
+}));
+productsRoutes.get('/:titulo', ProcessarError((req, resp)=>{
+  const titulo = req.params.titulo;
+  return productoController.obtenerProductoPorTitulo(titulo).then((producto) => {
+    if(!producto) throw new ProductoNoExiste(`El producto no existe`);
+    resp.json(producto);
+  })
+  logger.info(`Se ha encontrado concidencia con el texto '${titulo}'`)
+  resp.json(productos)
 }));
 //idea de metodo
 productsRoutes.get('/:id' , async (req,resp) =>{
@@ -68,7 +77,7 @@ productsRoutes.get('/:id' , async (req,resp) =>{
     res.json(producto);
   })
   res.send(`El producto ${producto.titulo} tiene el stock de ${producto.stock} unidades`);
-})
+});
 
 productsRoutes.put('/:id', validateProducto, async (req, res) => {
   const id = req.params.id;

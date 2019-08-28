@@ -24,6 +24,10 @@ function obtenerStockDeUnProducto(id){
     }
 }
 
+function obtenerProductoPorTitulo(titulo){
+    return Producto.find({titulo: /${titulo}/i});
+}
+
 function modificarProductos(id, producto) {
     return Producto.findOneAndUpdate({ __id: id }, {
         ...producto
@@ -40,5 +44,6 @@ module.exports = {
     obtenerProducto,
     modificarProductos,
     eliminarProducto,
-    obtenerStockDeUnProducto
+    obtenerStockDeUnProducto,
+    obtenerProductoPorTitulo
 }
