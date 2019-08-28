@@ -1,6 +1,7 @@
 const passportJWT = require('passport-jwt');
 const config = require('../../config');
 const usuarioController = require('../recursos/usuarios/usuarios.controller');
+const logger = require('../utils/logger');
 const { secret } = config;
 const configJWT = {
   secretOrKey: secret,
