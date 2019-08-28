@@ -6,6 +6,13 @@ const productoSchema = new mongoose.Schema({
         type: String,
         required: [true, 'producto debe tener siquira un titulo']
     },
+    descripcion:{
+        type: String
+    },
+    stock:{
+        type: Number,
+        min: 0
+    },
     precio: {
         type: Number,
         min: 0,
