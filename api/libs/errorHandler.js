@@ -1,3 +1,4 @@
+
 //JS file que validara los errores de que puede haber con la base de datos
 
 const mongoose  = require('moongose');

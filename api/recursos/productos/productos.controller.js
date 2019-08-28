@@ -6,7 +6,9 @@ function crearProducto(producto) {
 }
 
 function obtenerProductos() {
+
     return Producto.find({});
+
 }
 
 function obtenerProducto(id) {

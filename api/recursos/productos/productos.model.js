@@ -1,6 +1,7 @@
 //import the necesaries libs
 const mongoose = require('mongoose');
 
+// TODO: añadir mas validaciones
 const productoSchema = new mongoose.Schema({
     titulo: {
         type: String,

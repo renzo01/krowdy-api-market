@@ -5,10 +5,12 @@ const uuidv4 = require('uuid/v4');
 const passport = require('passport');
 
 const tokenValidate = require('../../libs/tokenValidate');
+
 const validateProducto = require('../productos/productos.validate');
 const productoController = require('../productos/productos.controller');
 const ProductoNoExiste  = require('../productos/productos.error').ProductoNoExiste;
 const ProcessarError = require('../../libs/errorHandler');
+
 const productos = require('../../../db').productos;
 
 const jwtAuthenticate = passport.authenticate('jwt', {session: false})
@@ -16,6 +18,7 @@ const jwtAuthenticate = passport.authenticate('jwt', {session: false})
 const productsRoutes = express.Router();
 
 const logger = require('../../utils/logger');
+
 
 // /productos/productos
 productsRoutes.get('/', ProcessarError((req, resp) => {
@@ -25,6 +28,7 @@ productsRoutes.get('/', ProcessarError((req, resp) => {
     }).catch((err) =>{
       logger.error(`No se pudo traer los productos`);
       res.status(500).send(`No se pudo listar los productos ${err}`)})
+
 }));
 
 productsRoutes.post('/',[tokenValidate, validateProducto], (req, resp) =>{
@@ -39,6 +43,7 @@ productsRoutes.post('/',[tokenValidate, validateProducto], (req, resp) =>{
     res.status(500).send(`ocurrio un error`);
   })
 });
+
 
 /* productoController.crearProducto(productoNuevo).then((productos) => {
     //add a product
@@ -78,6 +83,7 @@ productsRoutes.get('/:id' , async (req,resp) =>{
   })
   res.send(`El producto ${producto.titulo} tiene el stock de ${producto.stock} unidades`);
 });
+
 
 productsRoutes.put('/:id', validateProducto, async (req, res) => {
   const id = req.params.id;

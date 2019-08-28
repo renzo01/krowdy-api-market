@@ -11,7 +11,7 @@ const logger = require('./api/utils/logger');
 const productRouter = require('./api/recursos/productos/productos.routes');
 const usuarioRouter = require('./api/recursos/usuarios/usuarios.routes');
 const authJWT = require('./api/libs/auth');
-
+const errorHandler = require('./api/libs/errorHandler');
 const app = express();
 //in this part we connect with the monogodb
 mongoose.connect('mongodb://://root:training@172.31.23.49:27017/training?authSource=admin', { useNewUrlParser: true });
@@ -30,10 +30,15 @@ app.use(morgan('short',{
   }
 }));
 app.use(passport.initialize());
-//call the routers
-app.use('./usuarios', usuarioRouter);
-app.use('./productos', productRouter);
-//use an authentification, in this case is JWT
+
+
+app.use('/usuarios', usuariosRouter);
+app.use('/productos', productRouter);
+
+app.use(errorHandler.procesarErroresDeDB);
+app.use(errorHandler.catchResolver);
+
+
 passport.use(authJWT);
 //when someone stay in this endpoint 
 app.get('/',(request, response) => {
