@@ -24,15 +24,32 @@ productsRoutes.get('/', jwtAuthenticate, (req, res) => {
   .then((productos) => {
     res.json(productos);
   })
+  .catch((err) => {
+    logger.error(`Ocurrio un error al obtener productos ${err}`);
+    res.status(500).send(`fallo con los productos (get)`);
+  })
 });
 
-productoController.crearProducto(productoNuevo).then((productos) => {
+productsRoutes.post('/',[tokenValidate, validateProducto], (req, resp) =>{
+  const productoNuevo = { ...req.body, owner: req.user.username};
+
+  productoController.crearProducto(productoNuevo).then((producto)=>{
+    productos.push(producto);
+    res.status(201).json(producto);
+  })
+  .catch((err) => {
+    logger.error(`ocurrio un error en la db ${err}`);
+    res.status(500).send(`ocurrio un error`);
+  })
+});
+
+/* productoController.crearProducto(productoNuevo).then((productos) => {
     //add a product
     productos.push(productos);
     resp.status(201).json(productos);
   }).catch((err) => {
     logger.error(`Algo ocurrio en la db`);
-  });
+  }); */
 
 productsRoutes.get('/:id', async (req,resp) => {
   try{
