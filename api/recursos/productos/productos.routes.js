@@ -7,6 +7,7 @@ const passport = require('passport');
 const tokenValidate = require('../../libs/tokenValidate');
 const validateProducto = require('../productos/productos.validate');
 const productoController = require('../productos/productos.controller');
+const ProductoNoExiste  = require('../productos/productos.error').ProductoNoExiste;
 const productos = require('../../../db').productos;
 
 const jwtAuthenticate = passport.authenticate('jwt', {session: false})
@@ -52,14 +53,14 @@ productsRoutes.post('/',[tokenValidate, validateProducto], (req, resp) =>{
   }); */
 
 productsRoutes.get('/:id', async (req,resp) => {
-  try{
-    const producto = await productoController.obtenerProducto(req.params.id);
-    logger.info(`Se obtuvo el producto con id ${producto.id}`);
+  //obtener el id del producto al cual se quiere actualizar
+  const id = req.params.id;
+  return productoController.obtenerProducto(id).then((producto) =>{
+      if(!producto) throw new ProductoNoExiste(`El producto con el id ${id}, no existe`);
+      resp.json(producto);
+    })
+    logger.info(`se obtubo el producto con el id ${producto.id}`);
     resp.json(producto);
-  }catch (err){
-    console.log(err);
-    res.status(500).send(`Ocurrio algo en la db.`);
-  }
 });
 
 productsRoutes.put('/:id', validateProducto, async (req, res) => {
