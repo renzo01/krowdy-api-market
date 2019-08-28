@@ -21,6 +21,9 @@
     "passport-jwt": "^4.0.0",
     "uuid": "^3.3.2",
     "winston": "^2.4.2"
-
+  },
+  "devDependencies": {
+    "eslint": "^6.2.2",
+    "eslint-plugin-jest": "^22.15.2"
   }
 }

@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable import/no-extraneous-dependencies */
 const express = require('express');
 const uuidv4 = require('uuid/v4');
 const passport = require('passport');
@@ -15,8 +17,9 @@ const logger = require('../../utils/logger');
 
 // /productos/productos
 productsRoutes.get('/', jwtAuthenticate, (req, res) => {
+  
   console.log(req.user);
-  logger.info('Se obtuvo todos los productos');
+  logger.info('Se obtuvo todos los §productos');
   productoController.obtenerProductos()
   .then((productos) => {
     res.json(productos);

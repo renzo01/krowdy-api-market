@@ -1,20 +1,25 @@
-const passport = require('passport');
 const passportJWT = require('passport-jwt');
-const usuario = require('../../db');
-const usuarioController = require('../recursos/usuarios/usuarios.controller');
+const usurioController = require('../recursos/usuarios/usuarios.controller');
+const secret = require('../../config').secret;
+const logger = require('../utils/logger');
 
 const configJWT = {
-  secretOrKey = 'secreto',
-  jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
+    //permite setear una forma de encriptacion mediante una cadena 
+    secretOrKey: secret,
+    //solo toma la autentificacion mediante un token que debe ponerse en el header
+    jwtFromRequest: passportJWT.ExtractJwt.fromAuthHeaderAsBearerToken(),
 }
 
-let jwtStrategy = new passportJWT.Strategy(configJWT, async (jwtPayload, done) => {
-  const usuarioLogueado = await usuarioController.obtenerUsuario(null, jwtPayload.id);
-  const usuario = {
-    id: usuarioLogueado.id,
-    username : usuarioLogueado.username
-  }
-  return done(`ha ocurrido un error con la authentificacion.`,null)
+let jwtStreategy = new passportJWT.Strategy(configJWT, async (jwtPaylad, next) =>{
+    try{
+        const usuarioLogueado = await usurioController.obtenerUsuario(null,jwtPaylad.id);
+        next(null,{
+            id: usuarioLogueado.id,
+            username: usuarioLogueado.username
+        });
+    }
+    catch(err){
+        logger.error(`Algo paso en la db ${err}`);
+    }
 });
-
-module.exports = jwtStrategy;
+module.exports = jwtStreategy;
