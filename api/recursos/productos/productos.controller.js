@@ -1,4 +1,5 @@
 const Producto = require('./productos.model');
+const logger = require('../../utils/logger');
 
 function crearProducto(producto) {
     return new Producto(producto).save();
@@ -11,10 +12,21 @@ function obtenerProductos() {
 function obtenerProducto(id) {
     return Producto.findByID(id);
 }
+function obtenerStockDeUnProducto(id){
+    const productoStock = Producto.findById(id);
+    try{
+        if(productoStock.stock > 0){
+            return productoStock;
+        }
+    }catch (err){
+        logger.info(`Este producto no tiene stock, pero igual te lo muestro`);
+        return productoStock;
+    }
+}
 
-function modificarProductos(id, productos) {
+function modificarProductos(id, producto) {
     return Producto.findOneAndUpdate({ __id: id }, {
-        ...Producto
+        ...producto
     }, { new: true });
 }
 
@@ -27,5 +39,6 @@ module.exports = {
     obtenerProductos,
     obtenerProducto,
     modificarProductos,
-    eliminarProducto
+    eliminarProducto,
+    obtenerStockDeUnProducto
 }

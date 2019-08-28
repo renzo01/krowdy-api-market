@@ -8,6 +8,7 @@ const tokenValidate = require('../../libs/tokenValidate');
 const validateProducto = require('../productos/productos.validate');
 const productoController = require('../productos/productos.controller');
 const ProductoNoExiste  = require('../productos/productos.error').ProductoNoExiste;
+const ProcessarError = require('../../libs/errorHandler');
 const productos = require('../../../db').productos;
 
 const jwtAuthenticate = passport.authenticate('jwt', {session: false})
@@ -17,19 +18,14 @@ const productsRoutes = express.Router();
 const logger = require('../../utils/logger');
 
 // /productos/productos
-productsRoutes.get('/', jwtAuthenticate, (req, res) => {
-  
-  console.log(req.user);
-  logger.info('Se obtuvo todos los §productos');
-  productoController.obtenerProductos()
-  .then((productos) => {
-    res.json(productos);
-  })
-  .catch((err) => {
-    logger.error(`Ocurrio un error al obtener productos ${err}`);
-    res.status(500).send(`fallo con los productos (get)`);
-  })
-});
+productsRoutes.get('/', ProcessarError((req, resp) => {
+  return productoController.obtenerProducto().then((producto)=>{
+    logger.info('Se obtuvo todos los productos');
+    res.json(producto);
+    }).catch((err) =>{
+      logger.error(`No se pudo traer los productos`);
+      res.status(500).send(`No se pudo listar los productos ${err}`)})
+}));
 
 productsRoutes.post('/',[tokenValidate, validateProducto], (req, resp) =>{
   const productoNuevo = { ...req.body, owner: req.user.username};
@@ -52,16 +48,27 @@ productsRoutes.post('/',[tokenValidate, validateProducto], (req, resp) =>{
     logger.error(`Algo ocurrio en la db`);
   }); */
 
-productsRoutes.get('/:id', async (req,resp) => {
-  //obtener el id del producto al cual se quiere actualizar
+productsRoutes.get('/:id', ProcessarError((req, resp) => {
   const id = req.params.id;
-  return productoController.obtenerProducto(id).then((producto) =>{
-      if(!producto) throw new ProductoNoExiste(`El producto con el id ${id}, no existe`);
-      resp.json(producto);
-    })
-    logger.info(`se obtubo el producto con el id ${producto.id}`);
-    resp.json(producto);
-});
+  return productoController.obtenerProducto(id)
+  .then((producto) =>{
+    if(!producto) throw new ProductoNoExiste(`El producto no existe`);
+    res.json(producto);
+  })
+  logger.info(`Se obtuvo el producto con id ${producto.id}`);
+  res.json(producto);
+}));
+//idea de metodo
+productsRoutes.get('/:id' , async (req,resp) =>{
+  //obtener el id del producto para la validacion
+  const id = req.param.id;
+  return productoController.obtenerStockDeUnProducto(id)
+  .then((producto) => {
+    if(!producto) throw new ProductoNoExiste(`El producto no existe`);
+    res.json(producto);
+  })
+  res.send(`El producto ${producto.titulo} tiene el stock de ${producto.stock} unidades`);
+})
 
 productsRoutes.put('/:id', validateProducto, async (req, res) => {
   const id = req.params.id;
