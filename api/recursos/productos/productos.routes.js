@@ -4,6 +4,7 @@ const uuidv4 = require('uuid/v4');
 const tokenValidate = require('../../libs/token.validate');
 const validateProducto = require('./productos.validate');
 const productoController = require('./productos.controller');
+//no fue usado
 const requireOwnerUser = require('../../libs/middleware')
 const productos = require('../../../db').productos;
 const productsRoutes = express.Router();
